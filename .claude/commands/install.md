@@ -2,9 +2,10 @@
 
 このコマンドは、Windows PC を N225AutoTrader ブリッジの **`--simulator` モードを起動できる状態まで**整えるセットアップです。
 
-> 本パッケージ（v0.5.0〜）は **exe 2つだけ**で動きます：ブリッジ＝同梱 setup.exe で導入／
-> ダッシュボード＝`起動_シミュレーション.exe`（アイコンをダブルクリック）。
+> 本パッケージ（v0.5.0〜）の基本ルートは **オールインワン installer（`N225AutoTrader-Simulator-Setup-x.y.z.exe`）1本**：
+> ダッシュボード一式の導入＋ブリッジの自動導入（未導入時のみ）＋デスクトップ「N225 シミュレーション」アイコン作成まで全部行う。
 > **Python も .NET も不要**。ビルド作業（dotnet build 等）も**ありません**。
+> ZIP 版（ポータブル）の場合はブリッジ `N225BrokerBridge-Setup-*.exe` を手動実行する。
 > Python が要るのは、ソース `n225_simulator_test_dashboard.py` から動かす**代替経路だけ**です。
 > 本コマンドが扱うのはシミュレータ起動に必要な範囲のみで、本番接続（kabu / TV / Cloudflare）は対象外です。
 
@@ -13,7 +14,7 @@
 ## 前提
 
 - 購読者の PC が Windows 10 (1809+) または Windows 11 (x64)
-- 購読者は配布 ZIP を展開済み（このフォルダ一式が手元にある）。まだなら Release ページから ZIP を取得して展開してもらう
+- 購読者は Release ページから installer（推奨）または ZIP を取得済み。installer 実行済みなら一式は `C:\Program Files\N225AutoTrader-Simulator\` にある
 - 購読者は既に Claude Code を起動しており、本コマンドが呼ばれている
 
 ---
