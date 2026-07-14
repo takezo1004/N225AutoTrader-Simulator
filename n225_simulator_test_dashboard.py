@@ -188,7 +188,13 @@ class SimulatorTestDashboard:
     def __init__(self, root: tk.Tk):
         self.root = root
         self.root.title("N225 Simulator Test Dashboard")
-        self.root.geometry("900x800")
+        # 画面（特にノートPC 1366x768）からはみ出さないよう、モニタサイズに合わせて収める
+        screen_w = self.root.winfo_screenwidth()
+        screen_h = self.root.winfo_screenheight()
+        win_w = min(900, screen_w - 40)
+        win_h = min(720, screen_h - 80)   # タスクバー分を差し引く
+        self.root.geometry(f"{win_w}x{win_h}")
+        self.root.minsize(640, 480)
 
         self.bridge_exe = DEFAULT_BRIDGE_EXE
         self.payload_dir = DEFAULT_PAYLOAD_DIR
@@ -324,7 +330,7 @@ class SimulatorTestDashboard:
                  bg=BG_MAIN, fg=TEXT_PRIMARY,
                  font=("Yu Gothic UI", 10, "bold")).pack(anchor="w", pady=(0, 4))
         self.bridge_log = scrolledtext.ScrolledText(
-            bridge_outer, height=14, font=("Consolas", 8), wrap=tk.NONE,
+            bridge_outer, height=10, font=("Consolas", 8), wrap=tk.NONE,
             background="#0F0F0F", foreground=WHITE,
             insertbackground=TEXT_PRIMARY,
             borderwidth=1, relief=tk.SOLID
