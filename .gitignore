@@ -1,0 +1,46 @@
+# N225AutoTrader-Simulator（製品1・無料サンプル・Public）用 .gitignore
+#
+# v0.5.0〜：ブリッジ＝setup.exe（実行ファイル）のみ・ソース非同梱（IP保護）。
+# git＝ダッシュボード等ソースのみ。setup.exe（*.exe）は ZIP＋GitHub Release で配布し
+# git には入れない。
+
+# === バイナリ（setup.exe 含む）・.NET 中間物 ===
+**/bin/
+**/obj/
+*.exe
+*.dll
+*.pdb
+
+# === Node（将来用）===
+node_modules/
+
+# === Secrets / 個人情報 ===
+*.Local.json
+appsettings.Local.json
+*.pfx
+*.p12
+*.key
+secrets.json
+.env
+.env.local
+
+# === ログ ===
+logs/
+*.log
+
+# === IDE / OS ===
+.vs/
+.vscode/settings.json
+*.suo
+*.user
+Thumbs.db
+.DS_Store
+
+# === Python キャッシュ ===
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# === Git ===
+.git/
