@@ -1,8 +1,9 @@
 # N225AutoTrader シミュレーション（製品1）の Python 依存物
 #
-# 追加パッケージは【不要】です（pip install は要りません）。
-# テストダッシュボード (n225_simulator_test_dashboard.py) は Python 3.10+ の
-# 標準ライブラリ (tkinter / urllib / subprocess / json / threading) のみで動きます。
-# tkinter は python.org 版 Python に標準同梱です。
+# 基本ルートでは Python 自体が【不要】です：
+#   ブリッジ＝setup.exe で導入（self-contained）／ダッシュボード＝起動_シミュレーション.exe。
 #
-# ※ ブリッジ本体は setup.exe で導入（self-contained・Python/.NET とも不要）。
+# ソース (n225_simulator_test_dashboard.py) から動かす代替経路でも、
+# 追加パッケージは【不要】です（pip install は要りません）。
+# Python 3.10+ の標準ライブラリ (tkinter / urllib / subprocess / json / threading) のみで動きます。
+# tkinter は python.org 版 Python に標準同梱です。

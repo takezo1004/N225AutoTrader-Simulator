@@ -10,16 +10,16 @@
 ---
 
 ## インストールには2つの道があります
-- **基本ルート（このREADME）**＝setup.exe で導入して起動（Claude Code 不要）。
+- **基本ルート（このREADME）**＝2つの exe をダブルクリックするだけ（Python / .NET / Claude Code すべて不要）。
 - **保険ルート**＝うまく行かないとき **Claude Code** に手伝ってもらう（[`CLAUDE.md`](CLAUDE.md) ／ `/install` `/verify` `/diagnose`）。
 
 ---
 
 ## 必要なもの
 - Windows 10（1809+）/ 11（x64）
-- **Python 3.10+**（テストダッシュボード。標準ライブラリのみ使用）
-- ※ .NET は**不要**（ブリッジは self-contained の setup.exe で導入）
+- ※ **Python も .NET も不要**（ブリッジ＝self-contained の setup.exe／ダッシュボード＝アイコン起動の exe）
 - ※ kabu / TradingView / Cloudflare / 独自ドメインも**不要**
+- （任意）ソース `n225_simulator_test_dashboard.py` から動かしたい場合のみ Python 3.10+（標準ライブラリのみ使用）
 
 ---
 
@@ -28,10 +28,11 @@
 ### 1. ブリッジを導入する
 フォルダ直下の **`N225BrokerBridge-Setup-x.y.z.exe`** をダブルクリックして導入します（管理者確認ダイアログは「はい」）。すでに導入済みなら、この手順は飛ばして構いません（「あれば入れない」）。
 
-> GitHub からソースだけを clone した場合、setup.exe はリポジトリに含まれません。**Release ページの ZIP**（setup.exe 同梱）を取得してください。
+> GitHub からソースだけを clone した場合、exe 類はリポジトリに含まれません。**Release ページの ZIP**（setup.exe・起動 exe 同梱）を取得してください。
 
 ### 2. テストダッシュボードを起動
-ルートの **`起動_シミュレーション.bat`** をダブルクリック。
+ルートの **`起動_シミュレーション.exe`**（チャートのアイコン）をダブルクリック。
+- 「Windows によって PC が保護されました」と出た場合は「詳細情報」→「実行」で起動できます（未署名のためのブラウザ/OS の一般的な警告です）。
 - ダッシュボードが導入済みブリッジを自動検出し、`--simulator` で起動します（MockBroker・本番口座に一切触れません）。
 - 起動時にシミュレータ用設定（`*.simulator.json`・passphrase=`abcdefg`・`TestStrategy` 登録）を `%LOCALAPPDATA%\N225BrokerBridge\` に書き出します（本番設定 `*.Local.json` とは別ファイル）。
 
@@ -54,7 +55,8 @@
 | 場所 | 中身 |
 |---|---|
 | `N225BrokerBridge-Setup-x.y.z.exe` | N225AutoTrader ブリッジ導入プログラム（**実行ファイルのみ**・self-contained） |
-| `n225_simulator_test_dashboard.py` ＋ `起動_シミュレーション.bat` | テストダッシュボード（Python・stdlib のみ・**ソース公開**） |
+| `起動_シミュレーション.exe` | テストダッシュボード（**アイコンをダブルクリックで起動**・Python 不要） |
+| `n225_simulator_test_dashboard.py` | 同ダッシュボードの**ソースコード**（上記 exe の中身。読める・Python があれば直接実行も可） |
 | `docs/` | 公開契約（`webhook-api-spec.md`・`simulator-mode.md`） |
 | `webhook_test/` | 7種のペイロード＋手順（`payloads/`・`STEP_BY_STEP.md`・`test_all.ps1`） |
 | `templates/` | 設定例（`appsettings.Local.json.example`） |

@@ -2,8 +2,10 @@
 
 このコマンドは、Windows PC を N225AutoTrader ブリッジの **`--simulator` モードを起動できる状態まで**整えるセットアップです。
 
-> 本パッケージ（v0.5.0〜）のブリッジは**同梱の setup.exe（実行ファイル）で導入**します。
-> ソースコードは同梱されず、ビルド作業（dotnet build 等）は**ありません**。
+> 本パッケージ（v0.5.0〜）は **exe 2つだけ**で動きます：ブリッジ＝同梱 setup.exe で導入／
+> ダッシュボード＝`起動_シミュレーション.exe`（アイコンをダブルクリック）。
+> **Python も .NET も不要**。ビルド作業（dotnet build 等）も**ありません**。
+> Python が要るのは、ソース `n225_simulator_test_dashboard.py` から動かす**代替経路だけ**です。
 > 本コマンドが扱うのはシミュレータ起動に必要な範囲のみで、本番接続（kabu / TV / Cloudflare）は対象外です。
 
 ---
@@ -19,9 +21,9 @@
 ## 全体フロー (Phase 1 〜 Phase 4)
 
 1. **Phase 1**. 環境の現状チェック
-2. **Phase 2**. 不足ツールのインストール（Python のみ）
-3. **Phase 3**. ブリッジの導入（同梱 setup.exe）
-4. **Phase 4**. 構築完了の検証
+2. **Phase 2**. ブリッジの導入（同梱 setup.exe）
+3. **Phase 3**. ダッシュボードの起動確認（`起動_シミュレーション.exe`）
+4. **Phase 4**. （代替経路・通常は不要）Python の導入＝ソース `.py` から動かしたい場合のみ
 
 ---
 
@@ -43,11 +45,10 @@
 | 項目 | 確認コマンド | 期待値 |
 |---|---|---|
 | Windows バージョン | `(Get-CimInstance Win32_OperatingSystem).Caption + ' ' + (Get-CimInstance Win32_OperatingSystem).Version` | Windows 10 build 17763 以上 または Windows 11 |
-| Python | `python --version` | 3.10〜3.13 |
-| ブリッジ導入済みか | `Test-Path "$env:ProgramFiles\N225BrokerBridge\N225BrokerBridge.UI.exe"` | `True` なら Phase 3 は不要（「あれば入れない」） |
-| winget | `winget --version` | 1.x 系（Python が無い場合のみ必要） |
+| ブリッジ導入済みか | `Test-Path "$env:ProgramFiles\N225BrokerBridge\N225BrokerBridge.UI.exe"` | `True` なら Phase 2 は不要（「あれば入れない」） |
+| 同梱物が揃っているか | `Get-ChildItem "N225BrokerBridge-Setup-*.exe", "起動_シミュレーション.exe"` | 両方ある（無ければ Release ZIP の再取得を案内） |
 
-※ **.NET のチェックは不要**（ブリッジは self-contained。SDK もランタイムも要らない）。
+※ **Python / .NET のチェックは不要**（ブリッジは self-contained・ダッシュボードは exe。どちらも追加ランタイム無しで動く）。
 
 ### 出力フォーマット
 各項目について「✅ ある (バージョン)」「❌ ない」を一覧表示。最後に不足項目のサマリーを提示し、次に何をするか購読者に確認する。
@@ -57,21 +58,7 @@
 
 ---
 
-## Phase 2. 不足ツールのインストール（Python のみ）
-
-Phase 1 で Python が無かった場合のみ。**購読者の確認 (y/N) を取ってから実行**。
-
-```powershell
-winget install --id Python.Python.3.12 -e --accept-source-agreements --accept-package-agreements
-```
-
-- インストール後、PATH は起動中のプロセスに反映されない。「**Claude Desktop アプリを完全に終了して起動し直し、新しいチャットで作業を再開してください**」と案内する。
-- 再起動後、`python --version` で反映を再確認。
-- winget が無い場合は「Microsoft Store を開いて App Installer をインストールしてください」と案内する。
-
----
-
-## Phase 3. ブリッジの導入（同梱 setup.exe）
+## Phase 2. ブリッジの導入（同梱 setup.exe）
 
 Phase 1 で導入済み（`Test-Path` が `True`）ならスキップ。
 
@@ -88,9 +75,9 @@ Phase 1 で導入済み（`Test-Path` が `True`）ならスキップ。
 
 ---
 
-## Phase 4. 構築完了の検証
+## Phase 3. ダッシュボードの起動確認
 
-### Step 4-1. ブリッジ exe の存在確認
+### Step 3-1. ブリッジ exe の存在確認
 
 ```powershell
 Test-Path "$env:ProgramFiles\N225BrokerBridge\N225BrokerBridge.UI.exe"
@@ -98,17 +85,33 @@ Test-Path "$env:ProgramFiles\N225BrokerBridge\N225BrokerBridge.UI.exe"
 
 `True` が返ればOK（既定以外の導入先を選んだ場合はレジストリ `HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{A0B1C2D3-E4F5-6789-ABCD-EF0123456789}_is1` の `InstallLocation` を確認）。
 
-### Step 4-2. ダッシュボードの起動テスト
+### Step 3-2. ダッシュボードの起動テスト
 
-購読者に「`起動_シミュレーション.bat` をダブルクリックしてください」と案内。ダッシュボード画面が開けばOK（ブリッジの起動テストは記事／`/verify` の範囲）。
+購読者に「`起動_シミュレーション.exe`（チャートのアイコン）をダブルクリックしてください」と案内。
+- 「Windows によって PC が保護されました」（SmartScreen）が出たら「**詳細情報 → 実行**」で起動できると案内する（未署名 exe への一般的な警告）。
+- 初回は展開のため数秒待つことがある。ダッシュボード画面が開けばOK（ブリッジの起動テストは記事／`/verify` の範囲）。
 
-### Step 4-3. 完了報告
+### Step 3-3. 完了報告
 
 購読者に以下の**結果だけ**を提示して止まる（次の手順・次回予告はしない。次に何をするかは記事が指示する）:
 
 - ブリッジの導入先
-- Python のバージョン
+- ダッシュボードが起動できたこと
 - 「構築作業はこれで完了です」とだけ伝える
+
+---
+
+## Phase 4. （代替経路・通常は不要）Python の導入
+
+`起動_シミュレーション.exe` がどうしても起動しない環境（社内 AV による隔離等）で、ソース `n225_simulator_test_dashboard.py` から動かす場合のみ。**購読者の確認 (y/N) を取ってから実行**。
+
+```powershell
+winget install --id Python.Python.3.12 -e --accept-source-agreements --accept-package-agreements
+```
+
+- インストール後、PATH は起動中のプロセスに反映されない。「**Claude Desktop アプリを完全に終了して起動し直し、新しいチャットで作業を再開してください**」と案内する。
+- 再起動後 `python --version` で反映を確認し、`python n225_simulator_test_dashboard.py` で起動（追加パッケージは不要・標準ライブラリのみ）。
+- winget が無い場合は「Microsoft Store を開いて App Installer をインストールしてください」と案内する。
 
 ---
 
@@ -125,5 +128,6 @@ Test-Path "$env:ProgramFiles\N225BrokerBridge\N225BrokerBridge.UI.exe"
 
 ## バージョン
 
+- v0.2.1 (2026-07-14): ダッシュボードをアイコン起動 exe（`起動_シミュレーション.exe`・Python 不要）へ。Python 導入は代替経路（Phase 4）に降格
 - v0.2.0 (2026-07-14): ブリッジ exe-only 配布へ全面改訂（clone・venv・dotnet build の Phase を廃止）
 - v0.1.0 (2026-05-27): 初版（旧3リポ構造・ソースビルド前提）

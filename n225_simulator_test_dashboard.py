@@ -36,7 +36,12 @@ from tkinter import scrolledtext
 
 
 # ─── 定数 ─────────────────────────────────────────────
-SCRIPT_DIR = Path(__file__).resolve().parent
+if getattr(sys, "frozen", False):
+    # PyInstaller onefile: __file__ は一時展開先(_MEIPASS)を指すため、
+    # webhook_test/ 等の同梱物は exe の置き場所から探す
+    SCRIPT_DIR = Path(sys.executable).resolve().parent
+else:
+    SCRIPT_DIR = Path(__file__).resolve().parent
 WEBHOOK_URL = "http://localhost:8000/webhook/"
 
 
