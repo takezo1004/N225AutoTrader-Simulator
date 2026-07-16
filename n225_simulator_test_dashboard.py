@@ -268,7 +268,7 @@ class SimulatorTestDashboard:
                  bg=BG_REMINDER, fg=WHITE,
                  font=("Yu Gothic UI", 9)).pack(padx=12, pady=0, anchor="w")
         tk.Label(reminder,
-                 text="  ② UI 右下の「自動売買」トグルを ON にしてから Test 1〜7 を再度実行 → 発注経路まで通ることを確認",
+                 text="  ② ブリッジウィンドウ上部の「自動売買」トグルを ON にしてから Test 1〜7 を再度実行 → 発注経路まで通ることを確認",
                  bg=BG_REMINDER, fg=WHITE,
                  font=("Yu Gothic UI", 9)).pack(padx=12, pady=(0, 6), anchor="w")
 
