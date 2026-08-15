@@ -119,7 +119,7 @@ E. "OrderRejected" ログ?                             → YES なら kabu 側�
 チェック順序:
 A. ブリッジ導入済み・実体が壊れていないか?
    → Test-Path "$env:ProgramFiles\N225BrokerBridge\N225BrokerBridge.UI.exe" で確認
-   → NO なら同梱の N225BrokerBridge-Setup-*.exe で（再）導入を案内
+   → NO なら N225AutoTrader-Simulator-Setup-*.exe（配布物はこの1本のみ）の再実行で（再）導入を案内
    ※ ブリッジは self-contained（.NET のインストールは不要。dotnet --list-runtimes の確認はしない）
 
 B. appsettings.Local.json 存在 + JSON valid?

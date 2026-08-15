@@ -374,7 +374,7 @@ class SimulatorTestDashboard:
             self.bridge_exe = _resolve_bridge_exe()
         if not self.bridge_exe.exists():
             self._log_response("fail", f"Bridge が見つかりません: {self.bridge_exe}")
-            self._log_response("info", "同梱の N225BrokerBridge-Setup-*.exe を実行してブリッジを導入してから、もう一度押してください")
+            self._log_response("info", "N225AutoTrader-Simulator-Setup-*.exe（インストーラ）をもう一度実行するとブリッジが導入されます。導入後にもう一度押してください")
             return
 
         # 1) シミュレータ設定を書き出す (毎回上書き = テストの再現性確保)

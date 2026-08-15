@@ -2,10 +2,9 @@
 
 このコマンドは、Windows PC を N225AutoTrader ブリッジの **`--simulator` モードを起動できる状態まで**整えるセットアップです。
 
-> 本パッケージ（v0.5.0〜）の基本ルートは **オールインワン installer（`N225AutoTrader-Simulator-Setup-x.y.z.exe`）1本**：
+> 本パッケージの配布物は **オールインワン installer（`N225AutoTrader-Simulator-Setup-x.y.z.exe`）1本だけ**（v0.5.3〜・ZIP 版は廃止）：
 > ダッシュボード一式の導入＋ブリッジの自動導入（未導入時のみ）＋デスクトップ「N225 シミュレーション」アイコン作成まで全部行う。
 > **Python も .NET も不要**。ビルド作業（dotnet build 等）も**ありません**。
-> ZIP 版（ポータブル）の場合はブリッジ `N225BrokerBridge-Setup-*.exe` を手動実行する。
 > Python が要るのは、ソース `n225_simulator_test_dashboard.py` から動かす**代替経路だけ**です。
 > 本コマンドが扱うのはシミュレータ起動に必要な範囲のみで、本番接続（kabu / TV / Cloudflare）は対象外です。
 
@@ -14,7 +13,7 @@
 ## 前提
 
 - 購読者の PC が Windows 10 (1809+) または Windows 11 (x64)
-- 購読者は Release ページから installer（推奨）または ZIP を取得済み。installer 実行済みなら一式は `C:\Program Files\N225AutoTrader-Simulator\` にある
+- 購読者は Release ページから installer（`N225AutoTrader-Simulator-Setup-x.y.z.exe`）を取得済み。実行済みなら一式は `C:\Program Files\N225AutoTrader-Simulator\` にある
 - 購読者は既に Claude Code を起動しており、本コマンドが呼ばれている
 
 ---
@@ -22,7 +21,7 @@
 ## 全体フロー (Phase 1 〜 Phase 4)
 
 1. **Phase 1**. 環境の現状チェック
-2. **Phase 2**. ブリッジの導入（同梱 setup.exe）
+2. **Phase 2**. ブリッジの導入（installer の再実行）
 3. **Phase 3**. ダッシュボードの起動確認（`起動_シミュレーション.exe`）
 4. **Phase 4**. （代替経路・通常は不要）Python の導入＝ソース `.py` から動かしたい場合のみ
 
@@ -47,7 +46,7 @@
 |---|---|---|
 | Windows バージョン | `(Get-CimInstance Win32_OperatingSystem).Caption + ' ' + (Get-CimInstance Win32_OperatingSystem).Version` | Windows 10 build 17763 以上 または Windows 11 |
 | ブリッジ導入済みか | `Test-Path "$env:ProgramFiles\N225BrokerBridge\N225BrokerBridge.UI.exe"` | `True` なら Phase 2 は不要（「あれば入れない」） |
-| 同梱物が揃っているか | `Get-ChildItem "N225BrokerBridge-Setup-*.exe", "起動_シミュレーション.exe"` | 両方ある（無ければ Release ZIP の再取得を案内） |
+| ダッシュボード導入済みか | `Test-Path "$env:ProgramFiles\N225AutoTrader-Simulator\起動_シミュレーション.exe"` | `True`（無ければ installer 未実行 → Release の Setup.exe 実行を案内） |
 
 ※ **Python / .NET のチェックは不要**（ブリッジは self-contained・ダッシュボードは exe。どちらも追加ランタイム無しで動く）。
 
@@ -59,16 +58,18 @@
 
 ---
 
-## Phase 2. ブリッジの導入（同梱 setup.exe）
+## Phase 2. ブリッジの導入（installer の再実行）
 
 Phase 1 で導入済み（`Test-Path` が `True`）ならスキップ。
 
-1. このフォルダ直下の `N225BrokerBridge-Setup-*.exe` を確認する:
+ブリッジは installer（`N225AutoTrader-Simulator-Setup-x.y.z.exe`）が未導入時のみ自動で入れる（chain install）。ここに来たのは chain が走らなかった／失敗したケースなので、**同じ installer をもう一度実行してもらう**。
+
+1. 購読者のダウンロードフォルダで installer を確認する:
    ```powershell
-   Get-ChildItem "N225BrokerBridge-Setup-*.exe" | Select-Object Name, Length
+   Get-ChildItem "$env:USERPROFILE\Downloads\N225AutoTrader-Simulator-Setup-*.exe" | Select-Object Name, Length
    ```
-   - 無い場合（git clone だけで ZIP を取っていない等）：「Release ページの ZIP（setup.exe 同梱）をダウンロードして展開してください」と案内する。
-2. 購読者に「デスクトップ等に見えているこのファイルをダブルクリックしてください。『このアプリがデバイスに変更を加えることを許可しますか？』は『はい』、あとは案内に沿って進めてください」と伝える（管理者権限ダイアログは購読者がクリックする。Claude Code から静かに実行しない）。
+   - 無い場合：「Release ページ（`https://github.com/takezo1004/N225AutoTrader-Simulator/releases/latest`）から `N225AutoTrader-Simulator-Setup-x.y.z.exe` をダウンロードしてください」と案内する（**配布物はこの1本だけ**）。
+2. 購読者に「このファイルをダブルクリックしてください。『このアプリがデバイスに変更を加えることを許可しますか？』は『はい』、あとは案内に沿って進めてください。途中で『自動売買の本体（ブリッジ）を導入しています…』と出れば正常です」と伝える（管理者権限ダイアログは購読者がクリックする。Claude Code から静かに実行しない）。
 3. 完了の申告を受けたら導入先を確認:
    ```powershell
    Test-Path "$env:ProgramFiles\N225BrokerBridge\N225BrokerBridge.UI.exe"
@@ -129,6 +130,7 @@ winget install --id Python.Python.3.12 -e --accept-source-agreements --accept-pa
 
 ## バージョン
 
+- v0.3.0 (2026-08-15): 配布物を installer（Setup.exe）1本に統一（ZIP＝ポータブル版を廃止）。Phase 2 は「同梱 setup.exe の実行」→「installer の再実行」へ
 - v0.2.1 (2026-07-14): ダッシュボードをアイコン起動 exe（`起動_シミュレーション.exe`・Python 不要）へ。Python 導入は代替経路（Phase 4）に降格
 - v0.2.0 (2026-07-14): ブリッジ exe-only 配布へ全面改訂（clone・venv・dotnet build の Phase を廃止）
 - v0.1.0 (2026-05-27): 初版（旧3リポ構造・ソースビルド前提）

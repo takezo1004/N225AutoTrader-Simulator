@@ -3,6 +3,8 @@
 > このファイルは、**基本ルート（[`README.md`](README.md)＝オールインワン installer 1本をダブルクリック → デスクトップの「N225 シミュレーション」を起動）でうまくいかなかったとき**に、
 > 購読者の Claude Code が手伝うための命令書です。基本が動いていれば本ファイルは不要です。
 >
+> v0.5.3（2026-08-15）：**配布物は installer `N225AutoTrader-Simulator-Setup-x.y.z.exe` の1種類だけ**（ZIP＝ポータブル版は廃止）。
+>
 > v0.5.0（2026-07-14）：①ブリッジは **setup.exe（実行ファイル）のみ**の同梱（ソース非同梱）
 > ②ダッシュボードは **`起動_シミュレーション.exe`（アイコン起動・Python 不要）** が主経路
 > （ソース `.py` は透明性のため同梱継続・Python があれば直接実行も可）。
@@ -15,7 +17,7 @@
 ```
 [テストダッシュボード] ──webhook(8000)──> [N225AutoTrader ブリッジ --simulator（MockBroker）]
 ```
-- ブリッジ＝同梱の **`N225BrokerBridge-Setup-x.y.z.exe`** で導入（self-contained・**.NET 不要**・ソース非同梱）。
+- ブリッジ＝**インストーラ `N225AutoTrader-Simulator-Setup-x.y.z.exe` が自動で導入**（未導入時のみ・self-contained・**.NET 不要**・ソース非同梱）。
 - テストダッシュボード＝**`起動_シミュレーション.exe`**（アイコン起動・**Python 不要**・ソース `.py` も同梱）が導入済みブリッジを自動検出して `--simulator` 起動＋7種ペイロード発火。
 
 ---

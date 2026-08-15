@@ -1,8 +1,8 @@
 # N225AutoTrader-Simulator（製品1・無料サンプル・Public）用 .gitignore
 #
 # v0.5.0〜：ブリッジ＝setup.exe（実行ファイル）のみ・ソース非同梱（IP保護）。
-# git＝ダッシュボード等ソースのみ。setup.exe（*.exe）は ZIP＋GitHub Release で配布し
-# git には入れない。
+# git＝ダッシュボード等ソースのみ。setup.exe（*.exe）は GitHub Release（Setup.exe 1本）で
+# 配布し git には入れない（2026-08-15：ZIP＝ポータブル版は廃止）。
 
 # === バイナリ（setup.exe 含む）・.NET 中間物 ===
 **/bin/
