@@ -146,7 +146,7 @@ private int _executionIdSequence = 0;
 | `BrokerCode` | `BrokerCode.Mock` (新規追加) を返す |
 | `IsConnected` | 常に `true` |
 | `PlaceOrderAsync` | OrderId 採番 (例: `MOCK-00001`) → `_orders` に Accepted で追加 → 50ms 後に約定 ExecutionEvent 発火 → `_positions` に建玉追加 |
-| `ClosePositionAsync` | 指定 `TargetExecutionId` の建玉を `_positions` から取得 → 残量チェック → OrderId 採番 → 50ms 後に約定 → `_positions` の残量を減らす (0 なら削除) |
+| `ClosePositionAsync` | 指定 `TargetExecutionId` の建玉を `_positions` から取得 → **銘柄突き合わせ** → 残量チェック → OrderId 採番 → 50ms 後に約定 → `_positions` の残量を減らす (0 なら削除)。拒否は 3 種: `MOCK_NO_POSITION`（建玉なし）／`MOCK_SYMBOL_MISMATCH`（**建玉と違う銘柄での返済**。例: Mini の建玉を Micro で返済）／`MOCK_INSUFFICIENT_QUANTITY`（残量不足） |
 | `CancelOrderAsync` | `_orders` の該当注文の State を Cancelled に更新 (実際には Mock では 50ms で約定するのでキャンセル成功は稀) |
 | `GetPositionsAsync` | `_positions.Values` を返す |
 | `GetOrdersAsync` | `_orders.Values` を返す |
@@ -334,7 +334,7 @@ protected override async void OnStartup(StartupEventArgs e)
 - **指値の価格条件**: 指値・逆指値の発火条件は無視。常に即時約定。
 - **部分約定**: 一括約定のみ。分割約定シミュレーションなし。
 - **約定遅延の大小**: 常に 50ms。リアルな遅延揺らぎはなし。
-- **kabu API のエラーコード**: Rejected ケースは Mock では発生しない (パラメータ妥当性チェックは最低限のみ)。
+- **kabu API のエラーコード**: kabu 固有のエラーコードは再現しない。ただし返済の妥当性 (建玉の有無・**銘柄の一致**・残量) は Mock 側で検査し、本物のブローカーと同じく `Rejected` を返す。
 - **WebSocket 切断**: Mock の `PriceStream` は内部 Timer で生成するため、切断・再接続シナリオは再現しない。
 - **本番口座の建玉再同期 (起動時 reconciliation)**: Mock は再起動するたびに建玉 0 から始まるため、reconciliation は no-op に近い。
 
@@ -411,4 +411,5 @@ protected override async void OnStartup(StartupEventArgs e)
 | 2026-05-27 | 0.1.0 | 初版ドラフト作成。MockBrokerAdapter 設計 + DI 切替 + 7 ペイロードテスト計画を明文化 |
 | 2026-05-27 | 0.1.1 | §15 ユーザー確認事項 7 件を確定値で更新。同時指定は `--simulator` 優先、手動発注は確認ダイアログ経由に変更 |
 | 2026-05-27 | 0.1.2 | 実装完了 + 起動確認済。Webhook ポートを 8001 → 8000 (test_all.ps1 と整合する appsettings.json 既定値) に訂正 |
+| 2026-08-16 | 0.1.4 | **不具合修正 (返済)**: 疑似ブローカーが返済リクエストの銘柄を見ておらず、建玉と違う銘柄での返済 (例: Mini の建玉を Micro で返済) が素通りしていた。本物のブローカーは「銘柄 + 建玉」で受けるため証券会社側で弾かれるケース。Mock でも同じく拒否するよう検査を追加 (`MOCK_SYMBOL_MISMATCH`)。併せて建玉なし / 残量不足のエラーコードを分離。単体テスト 5 件追加 |
 | 2026-08-16 | 0.1.3 | **不具合修正**: 銘柄解決が先物コードを無視して固定 1 銘柄 (`MOCK-NK225-202606`) を返していたため、Micro を選んでも建玉・注文が Mini として表示され、損益倍率もズレ、Micro 選択時は価格表示が止まっていた。先物コードごとに別銘柄を返す実装へ変更 + 限月の固定値を廃止 (当日から算出) + 価格 tick を解決済み全銘柄へ配信。単体テスト 6 件追加 (※本表は文書の版数。製品バージョンは据え置き) |
