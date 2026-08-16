@@ -153,10 +153,10 @@ private int _executionIdSequence = 0;
 | `GetQuoteAsync` | 55,600 ± 50 円のランダム値で `QuoteSnapshot` を生成 |
 | `ExecutionStream` | `_executionSubject.AsObservable()` |
 | `PriceStream` | `_priceSubject.AsObservable()` (バックグラウンドで 1 秒ごとに Tick を発火) |
-| `SubscribePriceAsync` | no-op (Mock は登録された全銘柄に常時 Tick を流す) |
-| `SubscribePricesAsync` | no-op |
-| `UnsubscribePriceAsync` | no-op |
-| `ResolveFutureSymbolAsync` | `ResolvedSymbol("MOCK-NK225-202606", "日経225Micro Mock", "2026年6月限")` を返す |
+| `SubscribePriceAsync` | 配信対象に追加 (Mock は登録された全銘柄に常時 Tick を流す) |
+| `SubscribePricesAsync` | 配信対象に一括追加 |
+| `UnsubscribePriceAsync` | 配信対象から除外 |
+| `ResolveFutureSymbolAsync` | **先物コードごとに別銘柄**を返す (例: `NK225mini` → `MOCK-NK225MINI-202609` / `NK225micro` → `MOCK-NK225MICRO-202609`)。限月は当日から算出 (第 2 金曜＝清算日を過ぎていれば翌限月)。解決した銘柄は価格ティックの配信対象に加わる |
 
 ### 5-3. 価格ティック生成
 
@@ -167,6 +167,8 @@ LastPrice = 55,600 + Random.Next(-50, 51)
 BidPrice  = LastPrice + 5
 AskPrice  = LastPrice - 5
 ```
+
+生成した価格は **解決済みの全銘柄** (Mini / Micro …) に同一価格で配信する。Mini と Micro は同じ原資産なので価格を分ける意味はないが、**銘柄ごとに tick を出す**ことが重要で、片方の銘柄でしか tick が出ないと UI 側は「選択中の銘柄と別物」と判定して現在値・BID/ASK の更新が止まる。
 
 (kabu の BID/ASK 命名は通常と逆なので、`docs/adapters/kabu.md §1` の規約に従う)
 
@@ -272,7 +274,11 @@ protected override async void OnStartup(StartupEventArgs e)
 5. `GetPositionsAsync` 初期状態 → 空配列
 6. `GetOrdersAsync` 初期状態 → 空配列
 7. `PriceStream` → 5 秒 subscribe して 5 件取得できる
-8. `ResolveFutureSymbolAsync` → `MOCK-NK225-202606` が返る
+8. `ResolveFutureSymbolAsync` → `NK225mini` と `NK225micro` で**別の銘柄コード**が返る (同じコードを返すと UI 突合が全部 Mini に寄る)
+9. `ResolveFutureSymbolAsync` → 限月ラベルと銘柄コード末尾の年月が一致し、過去の限月を返さない
+10. `PriceStream` → 解決済みの Mini / Micro 双方に tick が届く
+
+実装済み: `tests/N225BrokerBridge.Infrastructure.Tests/Brokers/Mock/MockBrokerAdapterTests.cs`
 
 ### 8-2. 統合テスト (手動)
 
@@ -405,3 +411,4 @@ protected override async void OnStartup(StartupEventArgs e)
 | 2026-05-27 | 0.1.0 | 初版ドラフト作成。MockBrokerAdapter 設計 + DI 切替 + 7 ペイロードテスト計画を明文化 |
 | 2026-05-27 | 0.1.1 | §15 ユーザー確認事項 7 件を確定値で更新。同時指定は `--simulator` 優先、手動発注は確認ダイアログ経由に変更 |
 | 2026-05-27 | 0.1.2 | 実装完了 + 起動確認済。Webhook ポートを 8001 → 8000 (test_all.ps1 と整合する appsettings.json 既定値) に訂正 |
+| 2026-08-16 | 0.1.3 | **不具合修正**: 銘柄解決が先物コードを無視して固定 1 銘柄 (`MOCK-NK225-202606`) を返していたため、Micro を選んでも建玉・注文が Mini として表示され、損益倍率もズレ、Micro 選択時は価格表示が止まっていた。先物コードごとに別銘柄を返す実装へ変更 + 限月の固定値を廃止 (当日から算出) + 価格 tick を解決済み全銘柄へ配信。単体テスト 6 件追加 (※本表は文書の版数。製品バージョンは据え置き) |
