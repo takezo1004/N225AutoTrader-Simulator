@@ -67,7 +67,7 @@ JSON スキーマ:
 {
   "passphrase": "string (任意、設定で必須化される)",
   "alert_name": "string (必須)",
-  "interval": "integer (必須、分単位、>0)",
+  "interval": "string (必須、分単位の数字を文字列で。例 15分なら 15。数値型で送ると HTTP 400)",
   "ticker": "string (必須、TV ティッカー、※本ブリッジでは無視)",
   "strategy": {
     "order_action": "string (必須、'buy' / 'sell')",
@@ -192,7 +192,7 @@ JSON スキーマ:
 {
   "passphrase": "your-strong-passphrase",
   "alert_name": "V7_7_Long_5min",
-  "interval": 5,
+  "interval": "5",
   "ticker": "OSE:NK225M1!",
   "strategy": {
     "order_action": "buy",
@@ -212,7 +212,7 @@ JSON スキーマ:
 {
   "passphrase": "your-strong-passphrase",
   "alert_name": "V7_7_Long_5min",
-  "interval": 5,
+  "interval": "5",
   "ticker": "OSE:NK225M1!",
   "strategy": {
     "order_action": "sell",
@@ -232,7 +232,7 @@ JSON スキーマ:
 {
   "passphrase": "your-strong-passphrase",
   "alert_name": "V7_7_Long_5min",
-  "interval": 5,
+  "interval": "5",
   "ticker": "OSE:NK225M1!",
   "strategy": {
     "order_action": "sell",
@@ -252,7 +252,7 @@ JSON スキーマ:
 {
   "passphrase": "your-strong-passphrase",
   "alert_name": "V7_7_Long_5min",
-  "interval": 5,
+  "interval": "5",
   "ticker": "OSE:NK225M1!",
   "strategy": {
     "order_action": "buy",
@@ -272,7 +272,7 @@ JSON スキーマ:
 {
   "passphrase": "your-strong-passphrase",
   "alert_name": "V7_7_Long_5min",
-  "interval": 5,
+  "interval": "5",
   "ticker": "OSE:NK225M1!",
   "strategy": {
     "order_action": "buy",
@@ -390,11 +390,16 @@ https://your-domain.com/webhook
 
 ### 7.2 メッセージ (Pine Strategy `alert()` 用テンプレート)
 
+> ⚠️ **`interval` は必ず引用符で囲む**（`"{{interval}}"`）。ブリッジの受信 DTO は文字列で受け取り、
+> その後に数値へ変換する。引用符なし（数値型）で送ると受信時点で **HTTP 400**
+> (`The JSON value could not be converted to System.String. Path: $.interval`) となり、
+> シグナルは届いても発注されない。2026-08-17 にローカル版で実際に発生し、本書の誤記が原因だった。
+
 ```json
 {
   "passphrase": "your-strong-passphrase",
   "alert_name": "{{strategy.order.alert_message}}",
-  "interval": {{interval}},
+  "interval": "{{interval}}",
   "ticker": "{{ticker}}",
   "strategy": {
     "order_action": "{{strategy.order.action}}",
@@ -435,7 +440,7 @@ curl -X POST http://localhost:8001/webhook \
   -d '{
     "passphrase": "your-strong-passphrase",
     "alert_name": "Test",
-    "interval": 5,
+    "interval": "5",
     "ticker": "OSE:NK225M1!",
     "strategy": {
       "order_action": "buy",
